@@ -1,9 +1,9 @@
 // 搜索引擎内容脚本 - 在搜索结果页面显示多引擎切换工具条
 
-(function() {
-  console.log('[多引擎工具条] 脚本开始执行...');
-  console.log('[多引擎工具条] 当前域名:', window.location.hostname);
-  console.log('[多引擎工具条] 当前 URL:', window.location.href);
+(function () {
+  console.log('[多引擎工具条] 脚本开始执行...')
+  console.log('[多引擎工具条] 当前域名:', window.location.hostname)
+  console.log('[多引擎工具条] 当前 URL:', window.location.href)
 
   // 工具条 CSS 样式
   const toolbarStyles = `
@@ -14,7 +14,7 @@
         flex-wrap: nowrap;
         flex-direction: row;
         gap: 8px;
-        padding: 8px 12px;
+        padding: 4px;
         background-color: rgba(255, 255, 255, 0.98);
         border: 1px solid #ccc;
         border-radius: 8px;
@@ -105,11 +105,11 @@
         color: #fff;
       }
     </style>
-  `;
+  `
 
   // 注入样式
-  document.head.insertAdjacentHTML('beforeend', toolbarStyles);
-  console.log('[多引擎工具条] 样式已注入');
+  document.head.insertAdjacentHTML('beforeend', toolbarStyles)
+  console.log('[多引擎工具条] 样式已注入')
 
   // 搜索引擎配置
   const searchEngines = [
@@ -119,234 +119,234 @@
     { name: "搜狗", url: "https://www.sogou.com/web?query=%d", domain: "www.sogou.com" },
     { name: "360", url: "https://www.so.com/s?q=%d", domain: "www.so.com" },
     { name: "Yandex", url: "https://yandex.com/search/?text=%d", domain: "yandex.com" }
-  ];
+  ]
 
   // 从 URL 提取搜索关键词
   function extractSearchQuery() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
+    const urlParams = new URLSearchParams(window.location.search)
+
     // 不同搜索引擎的参数名
-    const queryParam = urlParams.get('q') || 
-                       urlParams.get('wd') || 
-                       urlParams.get('query') || 
-                       urlParams.get('text') || 
-                       '';
-    
-    const query = decodeURIComponent(queryParam);
-    console.log('[多引擎工具条] 提取搜索关键词:', query);
-    return query;
+    const queryParam = urlParams.get('q') ||
+      urlParams.get('wd') ||
+      urlParams.get('query') ||
+      urlParams.get('text') ||
+      ''
+
+    const query = decodeURIComponent(queryParam)
+    console.log('[多引擎工具条] 提取搜索关键词:', query)
+    return query
   }
 
   // 获取当前搜索引擎
   function getCurrentEngine() {
-    const domain = window.location.hostname;
-    const engine = searchEngines.find(e => e.domain === domain);
-    console.log('[多引擎工具条] 当前引擎域名:', domain, '匹配结果:', engine);
-    return engine || searchEngines[0];
+    const domain = window.location.hostname
+    const engine = searchEngines.find(e => e.domain === domain)
+    console.log('[多引擎工具条] 当前引擎域名:', domain, '匹配结果:', engine)
+    return engine || searchEngines[0]
   }
 
   // 工具条拖动功能
   function initToolbarDrag(toolbar) {
-    let isDragging = false;
-    let rafId = null;
+    let isDragging = false
+    let rafId = null
 
-    console.log('[多引擎工具条] 初始化拖动功能');
+    console.log('[多引擎工具条] 初始化拖动功能')
 
-    toolbar.addEventListener('mousedown', function(e) {
+    toolbar.addEventListener('mousedown', function (e) {
       // 如果点击的是引擎按钮或切换按钮，不启动拖动
       if (e.target.classList.contains('engine-btn') ||
-          e.target.classList.contains('toolbar-toggle')) {
-        return;
+        e.target.classList.contains('toolbar-toggle')) {
+        return
       }
 
-      isDragging = true;
-      
-      // 添加 dragging 类，移除过渡效果
-      toolbar.classList.add('dragging');
+      isDragging = true
 
-      const startX = e.clientX;
-      const startY = e.clientY;
-      const startLeft = toolbar.offsetLeft;
-      const startTop = toolbar.offsetTop;
+      // 添加 dragging 类，移除过渡效果
+      toolbar.classList.add('dragging')
+
+      const startX = e.clientX
+      const startY = e.clientY
+      const startLeft = toolbar.offsetLeft
+      const startTop = toolbar.offsetTop
 
       function onMouseMove(moveEvent) {
-        if (!isDragging) return;
-        
-        if (rafId) return; // 避免重复调用
-        
-        rafId = requestAnimationFrame(function() {
-          const dx = moveEvent.clientX - startX;
-          const dy = moveEvent.clientY - startY;
-          
-          toolbar.style.left = (startLeft + dx) + 'px';
-          toolbar.style.top = (startTop + dy) + 'px';
-          toolbar.style.right = 'auto';
-          
-          rafId = null;
-        });
+        if (!isDragging) return
+
+        if (rafId) return // 避免重复调用
+
+        rafId = requestAnimationFrame(function () {
+          const dx = moveEvent.clientX - startX
+          const dy = moveEvent.clientY - startY
+
+          toolbar.style.left = (startLeft + dx) + 'px'
+          toolbar.style.top = (startTop + dy) + 'px'
+          toolbar.style.right = 'auto'
+
+          rafId = null
+        })
       }
 
       function onMouseUp() {
-        if (!isDragging) return;
-        
-        isDragging = false;
-        toolbar.classList.remove('dragging');
-        
+        if (!isDragging) return
+
+        isDragging = false
+        toolbar.classList.remove('dragging')
+
         if (rafId) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
+          cancelAnimationFrame(rafId)
+          rafId = null
         }
-        
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        
+
+        document.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('mouseup', onMouseUp)
+
         // 保存位置
-        const rect = toolbar.getBoundingClientRect();
+        const rect = toolbar.getBoundingClientRect()
         chrome.storage.local.set({
           toolbarLeft: rect.left + 'px',
           toolbarTop: rect.top + 'px'
-        });
+        })
       }
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
 
-      e.preventDefault();
-    });
+      e.preventDefault()
+    })
   }
 
   // 创建工具条
   function createToolbar() {
-    console.log('[多引擎工具条] 开始创建工具条...');
-    
+    console.log('[多引擎工具条] 开始创建工具条...')
+
     // 使用 chrome.storage.local 读取设置
     chrome.storage.local.get(['multiEngineMode', 'searchEngineList', 'theme', 'toolbarLeft', 'toolbarTop', 'toolbarDirection'], (result) => {
-      console.log('[多引擎工具条] 读取设置结果:', result);
-      
-      const mode = result.multiEngineMode || 'off';
-      console.log('[多引擎工具条] 多引擎模式:', mode);
-      
+      console.log('[多引擎工具条] 读取设置结果:', result)
+
+      const mode = result.multiEngineMode || 'off'
+      console.log('[多引擎工具条] 多引擎模式:', mode)
+
       if (mode !== 'on') {
-        console.log('[多引擎工具条] 多引擎模式未开启，不显示工具条');
-        return;
+        console.log('[多引擎工具条] 多引擎模式未开启，不显示工具条')
+        return
       }
 
       // 获取搜索关键词
-      const query = extractSearchQuery();
+      const query = extractSearchQuery()
       if (!query) {
-        console.log('[多引擎工具条] 未找到搜索关键词，不显示工具条');
-        return;
+        console.log('[多引擎工具条] 未找到搜索关键词，不显示工具条')
+        return
       }
 
       // 获取引擎列表
-      const engines = (result.searchEngineList && Array.isArray(result.searchEngineList) && result.searchEngineList.length > 0) 
-                      ? result.searchEngineList 
-                      : searchEngines;
-      const theme = result.theme || 'light';
-      const currentEngine = getCurrentEngine();
+      const engines = (result.searchEngineList && Array.isArray(result.searchEngineList) && result.searchEngineList.length > 0)
+        ? result.searchEngineList
+        : searchEngines
+      const theme = result.theme || 'light'
+      const currentEngine = getCurrentEngine()
 
-      console.log('[多引擎工具条] 引擎列表:', engines);
-      console.log('[多引擎工具条] 主题:', theme);
-      console.log('[多引擎工具条] 当前引擎:', currentEngine);
+      console.log('[多引擎工具条] 引擎列表:', engines)
+      console.log('[多引擎工具条] 主题:', theme)
+      console.log('[多引擎工具条] 当前引擎:', currentEngine)
 
       // 创建工具条 HTML
-      const toolbar = document.createElement('div');
-      toolbar.id = 'multi-engine-toolbar';
+      const toolbar = document.createElement('div')
+      toolbar.id = 'multi-engine-toolbar'
       if (theme === 'dark') {
-        toolbar.classList.add('dark');
+        toolbar.classList.add('dark')
       }
 
       // 从结果中加载方向
-      const savedDirection = result.toolbarDirection || 'horizontal';
+      const savedDirection = result.toolbarDirection || 'horizontal'
       if (savedDirection === 'vertical') {
-        toolbar.classList.add('vertical');
+        toolbar.classList.add('vertical')
       }
 
       // 切换方向按钮 (使用🔶图标)
-      const toggleBtn = document.createElement('button');
-      toggleBtn.className = 'toolbar-toggle';
-      toggleBtn.textContent = '🔶';
-      toggleBtn.title = savedDirection === 'vertical' ? '切换为横向' : '切换为竖向';
-      toggleBtn.style.transform = savedDirection === 'vertical' ? 'rotate(90deg)' : 'rotate(0deg)';
-      toggleBtn.style.transition = 'transform 0.3s ease';
+      const toggleBtn = document.createElement('button')
+      toggleBtn.className = 'toolbar-toggle'
+      toggleBtn.textContent = '🔶'
+      toggleBtn.title = savedDirection === 'vertical' ? '切换为横向' : '切换为竖向'
+      toggleBtn.style.transform = savedDirection === 'vertical' ? 'rotate(90deg)' : 'rotate(0deg)'
+      toggleBtn.style.transition = 'transform 0.3s ease'
 
-      toggleBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const isVertical = toolbar.classList.toggle('vertical');
-        toggleBtn.title = isVertical ? '切换为横向' : '切换为竖向';
-        toggleBtn.style.transform = isVertical ? 'rotate(90deg)' : 'rotate(0deg)';
+      toggleBtn.addEventListener('click', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        const isVertical = toolbar.classList.toggle('vertical')
+        toggleBtn.title = isVertical ? '切换为横向' : '切换为竖向'
+        toggleBtn.style.transform = isVertical ? 'rotate(90deg)' : 'rotate(0deg)'
         // 保存方向设置
-        chrome.storage.local.set({ toolbarDirection: isVertical ? 'vertical' : 'horizontal' });
-        console.log('[多引擎工具条] 切换方向:', isVertical ? '竖向' : '横向');
-      });
+        chrome.storage.local.set({ toolbarDirection: isVertical ? 'vertical' : 'horizontal' })
+        console.log('[多引擎工具条] 切换方向:', isVertical ? '竖向' : '横向')
+      })
 
-      toolbar.appendChild(toggleBtn);
+      toolbar.appendChild(toggleBtn)
 
       // 引擎按钮
       engines.forEach(engine => {
-        const btn = document.createElement('button');
-        btn.className = 'engine-btn';
-        btn.textContent = engine.name || '未知引擎';
+        const btn = document.createElement('button')
+        btn.className = 'engine-btn'
+        btn.textContent = engine.name || '未知引擎'
 
         // 如果是当前引擎，添加 active 类
         if (engine.name === currentEngine.name) {
-          btn.classList.add('active');
+          btn.classList.add('active')
         }
 
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('[多引擎工具条] 切换到引擎:', engine.name);
+        btn.addEventListener('click', function (e) {
+          e.preventDefault()
+          e.stopPropagation()
+          console.log('[多引擎工具条] 切换到引擎:', engine.name)
           // 切换到新搜索引擎
           if (!engine.url) {
-            console.error('[多引擎工具条] 引擎 URL 为空:', engine);
-            return;
+            console.error('[多引擎工具条] 引擎 URL 为空:', engine)
+            return
           }
-          const newUrl = engine.url.replace('%d', encodeURIComponent(query));
-          window.location.href = newUrl;
-        });
+          const newUrl = engine.url.replace('%d', encodeURIComponent(query))
+          window.location.href = newUrl
+        })
 
-        toolbar.appendChild(btn);
-      });
+        toolbar.appendChild(btn)
+      })
 
-      document.body.appendChild(toolbar);
-      console.log('[多引擎工具条] 工具条已添加到页面');
+      document.body.appendChild(toolbar)
+      console.log('[多引擎工具条] 工具条已添加到页面')
 
       // 从结果中加载位置
-      const savedLeft = result.toolbarLeft;
-      const savedTop = result.toolbarTop;
+      const savedLeft = result.toolbarLeft
+      const savedTop = result.toolbarTop
 
       if (savedLeft && savedTop) {
-        toolbar.style.left = savedLeft;
-        toolbar.style.top = savedTop;
-        console.log('[多引擎工具条] 使用保存的位置:', savedLeft, savedTop);
+        toolbar.style.left = savedLeft
+        toolbar.style.top = savedTop
+        console.log('[多引擎工具条] 使用保存的位置:', savedLeft, savedTop)
       } else {
         // 默认位置：页面右上角
-        toolbar.style.right = '20px';
-        toolbar.style.top = '80px';
-        console.log('[多引擎工具条] 使用默认位置：右上角');
+        toolbar.style.right = '20px'
+        toolbar.style.top = '80px'
+        console.log('[多引擎工具条] 使用默认位置：右上角')
       }
 
       // 初始化工具条拖动功能
-      initToolbarDrag(toolbar);
+      initToolbarDrag(toolbar)
 
       // 关闭按钮事件
-      closeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('[多引擎工具条] 关闭工具条');
-        toolbar.remove();
-      });
-    });
+      closeBtn.addEventListener('click', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        console.log('[多引擎工具条] 关闭工具条')
+        toolbar.remove()
+      })
+    })
   }
 
   // 页面加载完成后创建工具条
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', createToolbar);
+    document.addEventListener('DOMContentLoaded', createToolbar)
   } else {
-    createToolbar();
+    createToolbar()
   }
 
-  console.log('[多引擎工具条] 脚本执行完成');
-})();
+  console.log('[多引擎工具条] 脚本执行完成')
+})()
