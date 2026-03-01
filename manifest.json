@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "自定义新标签页",
+  "version": "1.0.0",
+  "description": "一个美观实用的新标签页扩展，带有搜索功能和个性化设置",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "action": {
+    "default_popup": "",
+    "default_title": "新标签页设置"
+  },
+  "icons": {
+    "16": "icon/icon16.png",
+    "48": "icon/icon48.png",
+    "128": "icon/icon128.png"
+  }
+}

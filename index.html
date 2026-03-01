@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新标签页</title>
+
+    <style>
+      body,
+      html {
+        display: block;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        height: 100%;
+        width: 100%;
+        font-size: 16px;
+        user-select: none;
+        overflow: hidden;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      h3,
+      button {
+        padding: 0;
+        margin: 0;
+      }
+
+      * {
+        font-size: 1rem;
+      }
+
+      body {
+        background-color: #e6e6e6;
+        color: #252526;
+      }
+
+      body.dark {
+        background-color: #252526;
+        color: #dadada;
+      }
+
+      body.dark main button {
+        color: aquamarine;
+      }
+
+      body.dark main input {
+        color: rgb(172, 172, 172);
+      }
+
+      main {
+        margin: 0 auto;
+        width: 800px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        /* 改为stretch以使子元素拉伸到相同高度 */
+        border: 1px solid #575757;
+        padding: .2rem;
+        box-sizing: border-box;
+        /*确保包含边框的宽度计算 */
+        height: 40px;
+        /* 设置高度为可调整 */
+      }
+
+      .search-engine-list {
+        position: absolute;
+        flex-direction: column;
+        align-items: center;
+        background-color: #e0e0e0;
+        border: 1px solid #a7a7a7;
+        border-radius: .25rem;
+        top: 3.5rem;
+        left: 0;
+        z-index: 9;
+        display: none;
+        width: 7rem;
+        overflow: hidden;
+      }
+
+      body.dark .search-engine-list {
+        background-color: #3b3b3b;
+        border: 1px solid #555;
+      }
+
+      .search-engine-list .item {
+        cursor: pointer;
+        padding: .3rem 0;
+        display: block;
+        position: relative;
+        color: #333;
+        border-bottom: 1px solid #e0e0e0;
+        width: 100%;
+        text-align: center;
+      }
+
+      body.dark .search-engine-list .item {
+        color: #e0e0e0;
+        border-bottom: 1px solid #444;
+      }
+
+      .search-engine-list .item:last-child {
+        border-bottom: none;
+      }
+
+      .search-engine-list .item.active {
+        background-color: #0078D4;
+        color: white;
+      }
+
+      body.dark .search-engine-list .item.active {
+        background-color: #005a9e;
+      }
+
+      .search-engine-list .item.active::before {
+        position: absolute;
+        content: "*";
+        left: .5rem;
+        top: .5rem;
+      }
+
+      .search-engine-list .item:hover {
+        background-color: #e6f0fa;
+      }
+
+      body.dark .search-engine-list .item:hover {
+        background-color: #4a4a4a;
+      }
+
+      .search-engine {
+        background-color: #2d633d;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+        flex-shrink: 0;
+      }
+
+      .search-box {
+        width: 100%;
+        padding: 0 1rem;
+        font-size: 1.5rem;
+        margin: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        height: 100%;
+        box-sizing: border-box;
+      }
+
+      main input,
+      main button,
+      .search-engine-name {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        height: 100%;
+      }
+
+      main input:focus {
+        outline: none;
+      }
+
+      main button:hover {
+        background-color: #005a9e;
+        transform: scale(1.05);
+      }
+
+      main button:active {
+        transform: scale(0.95);
+      }
+
+      .search-engine-name {
+        padding: 0 1rem;
+        background-color: #2d633d;
+        color: white;
+        font-size: 1rem;
+        font-weight: 500;
+        /* 调整字体权重以匹配按钮文本的视觉重量 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+        height: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        /* 重置默认margin */
+        border: none;
+      }
+
+      .search-button {
+        padding: 0 1rem;
+        background-color: #0078D4;
+        border: none;
+        cursor: pointer;
+        color: white;
+        font-size: 1rem;
+        min-width: 80px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .button {
+        margin-right: -1px;
+        /*消除右侧空白，与main容器对齐 */
+        flex-shrink: 0;
+        /*防止按钮被压缩 */
+        min-width: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+      }
+
+      /* 设置面板样式 */
+      .settings-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1000;
+      }
+
+      .settings-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .settings-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border-radius: 10px;
+        width: 500px;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      body.dark .settings-content {
+        background-color: #2d2d2d;
+        color: #dadada;
+      }
+
+      body.dark .settings-header {
+        background-color: #3a3a3a;
+        border-bottom-color: #444;
+      }
+
+      body.dark .settings-body {
+        scrollbar-color: #0078D4 #3a3a3a;
+      }
+
+      body.dark .settings-body::-webkit-scrollbar-track {
+        background: #3a3a3a;
+      }
+
+      body.dark .settings-body::-webkit-scrollbar-thumb {
+        background: #0078D4;
+      }
+
+      .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        background-color: #f8f9fa;
+        border-radius: 10px 10px 0 0;
+        flex-shrink: 0;
+      }
+
+      body.dark .settings-header {
+        border-bottom-color: #444;
+      }
+
+      .settings-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .close-btn {
+        font-size: 2rem;
+        cursor: pointer;
+        padding: 0 10px;
+      }
+
+      .settings-body {
+        padding: 20px;
+        overflow-y: auto;
+        flex: 1;
+        /* 自定义滚动条 */
+        scrollbar-width: thin;
+        scrollbar-color: #0078D4 #f1f1f1;
+      }
+
+      /* Webkit浏览器滚动条样式 */
+      .settings-body::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .settings-body::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+
+      .settings-body::-webkit-scrollbar-thumb {
+        background: #0078D4;
+        border-radius: 4px;
+      }
+
+      .settings-body::-webkit-scrollbar-thumb:hover {
+        background: #005a9e;
+      }
+
+      .settings-section {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #0078D4;
+      }
+
+      body.dark .settings-section {
+        background-color: #333;
+        border-left-color: #0078D4;
+      }
+
+      .settings-section h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #333;
+        padding-bottom: 8px;
+        font-size: 1.2rem;
+        position: relative;
+      }
+
+      .settings-section h3::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, #0078D4, #005a9e);
+        border-radius: 2px;
+      }
+
+      body.dark .settings-section h3 {
+        color: #dadada;
+      }
+
+      .setting-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 12px 15px;
+        background-color: #fff;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+      }
+
+      .setting-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #0078D4;
+      }
+
+      body.dark .setting-item {
+        background-color: #404040;
+        border-color: #555;
+      }
+
+      body.dark .setting-item:hover {
+        border-color: #0078D4;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .setting-item label {
+        flex: 1;
+        font-weight: 500;
+        color: #495057;
+      }
+
+      body.dark .setting-item label {
+        color: #e9ecef;
+      }
+
+      .setting-item input[type="range"] {
+        flex: 2;
+        margin: 0 10px;
+        height: 6px;
+        -webkit-appearance: none;
+        background: #e9ecef;
+        border-radius: 3px;
+        outline: none;
+      }
+
+      .setting-item input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #0078D4;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+      }
+
+      .setting-item input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        box-shadow: 0 3px 8px rgba(0, 120, 212, 0.4);
+      }
+
+      .setting-item input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #0078D4;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+      }
+
+      body.dark .setting-item input[type="range"] {
+        background: #5a5a5a;
+      }
+
+      .setting-item span {
+        width: 60px;
+        text-align: right;
+        font-weight: 600;
+        color: #0078D4;
+        background: linear-gradient(135deg, #0078D4, #005a9e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .setting-item select,
+      .setting-item input[type="text"] {
+        flex: 2;
+        padding: 10px 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        background-color: #fff;
+        font-size: 0.95rem;
+      }
+
+      .setting-item select:focus,
+      .setting-item input[type="text"]:focus {
+        outline: none;
+        border-color: #0078D4;
+        box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+      }
+
+      body.dark .setting-item select,
+      body.dark .setting-item input[type="text"] {
+        background-color: #4a4a4a;
+        border-color: #5a5a5a;
+        color: #e9ecef;
+      }
+
+      body.dark .setting-item select:focus,
+      body.dark .setting-item input[type="text"]:focus {
+        border-color: #0078D4;
+        box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.2);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #0078D4, #005a9e);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 120, 212, 0.4);
+      }
+
+      .btn-secondary:active {
+        transform: translateY(0);
+      }
+
+      .btn-secondary:hover {
+        background-color: #005a9e;
+      }
+
+      .engine-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+      }
+
+      body.dark .engine-item {
+        background-color: #3a3a3a;
+      }
+
+      .engine-info {
+        flex: 1;
+      }
+
+      .engine-name {
+        font-weight: bold;
+        margin-bottom: 3px;
+      }
+
+      .engine-url {
+        font-size: 0.9em;
+        color: #666;
+      }
+
+      body.dark .engine-url {
+        color: #aaa;
+      }
+
+      .engine-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .engine-btn {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .edit-btn {
+        background-color: #ffc107;
+        color: #000;
+      }
+
+      .delete-btn {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .engine-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+        background-color: #e9ecef;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+
+      body.dark .engine-form {
+        background-color: #444;
+      }
+
+      .engine-form input {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .engine-form-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      .save-btn {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .cancel-btn {
+        background-color: #6c757d;
+        color: white;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div style="display: flex; justify-content: end;">
+        <span id="settingsBtn" style="display: block; padding: .5rem; cursor: pointer; font-size: 1.2rem;">⚙️</span>
+      </div>
+      <!-- 设置面板 -->
+      <div id="settingsPanel" class="settings-panel" style="display: none;">
+        <div class="settings-overlay"></div>
+        <div class="settings-content">
+          <div class="settings-header">
+            <h2>设置</h2>
+            <span id="closeSettings" class="close-btn">×</span>
+          </div>
+          <div class="settings-body">
+            <div class="settings-section">
+              <h3>主题设置</h3>
+              <div class="setting-item">
+                <label>主题模式</label>
+                <select id="themeSelect">
+                  <option value="light">浅色模式</option>
+                  <option value="dark">深色模式</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>搜索框样式</h3>
+              <div class="setting-item">
+                <label>搜索框宽度</label>
+                <input type="range" id="widthSlider" min="400" max="800" step="10">
+                <span id="widthValue">600px</span>
+              </div>
+              <div class="setting-item">
+                <label>搜索框高度</label>
+                <input type="range" id="heightSlider" min="30" max="100" step="5">
+                <span id="heightValue">40px</span>
+              </div>
+              <div class="setting-item">
+                <label>圆角大小</label>
+                <input type="range" id="radiusSlider" min="0" max="30" step="1">
+                <span id="radiusValue">0px</span>
+              </div>
+              <div class="setting-item">
+                <label>字体大小</label>
+                <input type="range" id="fontSizeSlider" min="12" max="24" step="1">
+                <span id="fontSizeValue">16px</span>
+              </div>
+              <div class="setting-item">
+                <label>顶部间距</label>
+                <input type="range" id="topHeightSlider" min="0" max="50" step="10">
+                <span id="topHeightValue">0px</span>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>搜索行为设置</h3>
+              <div class="setting-item">
+                <label>搜索结果打开方式</label>
+                <select id="searchTargetSelect">
+                  <option value="_self">当前标签页打开</option>
+                  <option value="_blank">新标签页打开</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <h3>搜索引擎管理</h3>
+              <div class="setting-item">
+                <button id="addEngineBtn" class="btn-secondary">添加搜索引擎</button>
+              </div>
+              <div id="engineList" class="engine-list">
+                <!--搜索引擎列表将在这里动态生成 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <!-- 当前搜索引擎 -->
+      <div class="search-engine">
+        <div id="currentSearchEngine" class="search-engine-name" style="cursor: pointer;"></div>
+        <div class="search-engine-list">
+        </div>
+      </div>
+      <div style="flex: 1; min-width: 0; margin: 0 0.5rem;">
+        <input type="text" class="search-box" placeholder="请输入搜索内容...">
+      </div>
+      <div class="button">
+        <button class="search-button">搜索</button>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+
+</html>
