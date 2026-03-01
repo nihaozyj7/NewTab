@@ -14,18 +14,23 @@
         flex-wrap: nowrap;
         flex-direction: row;
         gap: 8px;
-        padding: 12px 16px;
-        background-color: rgba(255, 255, 255, 0.95);
+        padding: 8px 12px;
+        background-color: rgba(255, 255, 255, 0.98);
         border: 1px solid #ccc;
         border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 999999 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 2147483647 !important;
         max-width: 80%;
         max-height: 80vh;
-        cursor: move;
+        cursor: grab;
         user-select: none;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        transition: all 0.3s ease;
+        will-change: transform;
+        transform: translateZ(0);
+      }
+
+      #multi-engine-toolbar:active {
+        cursor: grabbing;
       }
 
       #multi-engine-toolbar.vertical {
@@ -33,18 +38,23 @@
         max-width: 200px;
       }
 
+      #multi-engine-toolbar.dragging {
+        transition: none !important;
+        pointer-events: none;
+      }
+
       #multi-engine-toolbar.dark {
-        background-color: rgba(45, 45, 45, 0.95);
+        background-color: rgba(45, 45, 45, 0.98);
         border-color: #555;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
       }
 
       #multi-engine-toolbar .engine-btn {
-        padding: 8px 16px;
+        padding: 6px 12px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
         background-color: #0078D4;
         color: white;
@@ -54,8 +64,8 @@
       }
 
       #multi-engine-toolbar .engine-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 120, 212, 0.4);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 120, 212, 0.4);
         background-color: #005a9e;
       }
 
@@ -68,36 +78,11 @@
         background-color: #218838;
       }
 
-      #multi-engine-toolbar .toolbar-close {
-        font-size: 18px;
-        cursor: pointer;
-        color: #666;
-        padding: 4px 8px;
-        border-radius: 4px;
-        transition: all 0.2s;
-        line-height: 1;
-        flex-shrink: 0;
-      }
-
-      #multi-engine-toolbar .toolbar-close:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-        color: #333;
-      }
-
-      #multi-engine-toolbar.dark .toolbar-close {
-        color: #aaa;
-      }
-
-      #multi-engine-toolbar.dark .toolbar-close:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: #fff;
-      }
-
       #multi-engine-toolbar .toolbar-toggle {
-        font-size: 16px;
+        font-size: 14px;
         cursor: pointer;
         color: #666;
-        padding: 4px 8px;
+        padding: 4px 6px;
         border-radius: 4px;
         transition: all 0.2s;
         line-height: 1;
@@ -163,62 +148,71 @@
   // 工具条拖动功能
   function initToolbarDrag(toolbar) {
     let isDragging = false;
-    let startX, startY, initialLeft, initialTop;
+    let rafId = null;
 
     console.log('[多引擎工具条] 初始化拖动功能');
 
     toolbar.addEventListener('mousedown', function(e) {
-      console.log('[多引擎工具条] mousedown 事件触发，目标:', e.target.className);
-      
-      // 如果点击的是关闭按钮或引擎按钮，不启动拖动
-      if (e.target.classList.contains('toolbar-close') ||
-          e.target.classList.contains('engine-btn') ||
-          e.target.classList.contains('toolbar-hint')) {
-        console.log('[多引擎工具条] 点击的是按钮，不拖动');
+      // 如果点击的是引擎按钮或切换按钮，不启动拖动
+      if (e.target.classList.contains('engine-btn') ||
+          e.target.classList.contains('toolbar-toggle')) {
         return;
       }
 
       isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
+      
+      // 添加 dragging 类，移除过渡效果
+      toolbar.classList.add('dragging');
 
-      // 获取当前位置
-      const rect = toolbar.getBoundingClientRect();
-      initialLeft = rect.left;
-      initialTop = rect.top;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startLeft = toolbar.offsetLeft;
+      const startTop = toolbar.offsetTop;
 
-      console.log('[多引擎工具条] 开始拖动，初始位置:', initialLeft, initialTop);
+      function onMouseMove(moveEvent) {
+        if (!isDragging) return;
+        
+        if (rafId) return; // 避免重复调用
+        
+        rafId = requestAnimationFrame(function() {
+          const dx = moveEvent.clientX - startX;
+          const dy = moveEvent.clientY - startY;
+          
+          toolbar.style.left = (startLeft + dx) + 'px';
+          toolbar.style.top = (startTop + dy) + 'px';
+          toolbar.style.right = 'auto';
+          
+          rafId = null;
+        });
+      }
 
-      // 移除 right 属性以便使用 left 定位
-      toolbar.style.right = 'auto';
-      toolbar.style.left = initialLeft + 'px';
-      toolbar.style.top = initialTop + 'px';
-
-      e.preventDefault();
-    }, true);
-
-    document.addEventListener('mousemove', function(e) {
-      if (!isDragging) return;
-
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
-      toolbar.style.left = (initialLeft + dx) + 'px';
-      toolbar.style.top = (initialTop + dy) + 'px';
-    }, true);
-
-    document.addEventListener('mouseup', function() {
-      if (isDragging) {
+      function onMouseUp() {
+        if (!isDragging) return;
+        
         isDragging = false;
+        toolbar.classList.remove('dragging');
+        
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        
+        // 保存位置
         const rect = toolbar.getBoundingClientRect();
-        console.log('[多引擎工具条] 拖动结束，保存位置:', rect.left, rect.top);
-        // 使用 chrome.storage 保存位置
         chrome.storage.local.set({
           toolbarLeft: rect.left + 'px',
           toolbarTop: rect.top + 'px'
         });
       }
-    }, true);
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+
+      e.preventDefault();
+    });
   }
 
   // 创建工具条
@@ -226,7 +220,7 @@
     console.log('[多引擎工具条] 开始创建工具条...');
     
     // 使用 chrome.storage.local 读取设置
-    chrome.storage.local.get(['multiEngineMode', 'searchEngineList', 'theme', 'toolbarLeft', 'toolbarTop'], (result) => {
+    chrome.storage.local.get(['multiEngineMode', 'searchEngineList', 'theme', 'toolbarLeft', 'toolbarTop', 'toolbarDirection'], (result) => {
       console.log('[多引擎工具条] 读取设置结果:', result);
       
       const mode = result.multiEngineMode || 'off';
@@ -268,30 +262,25 @@
         toolbar.classList.add('vertical');
       }
 
-      // 关闭按钮
-      const closeBtn = document.createElement('span');
-      closeBtn.className = 'toolbar-close';
-      closeBtn.textContent = '×';
-      closeBtn.title = '关闭工具条';
-      toolbar.appendChild(closeBtn);
-
-      // 切换方向按钮 (使用 UTF 表情符号)
+      // 切换方向按钮 (使用🔶图标)
       const toggleBtn = document.createElement('button');
       toggleBtn.className = 'toolbar-toggle';
-      toggleBtn.textContent = savedDirection === 'vertical' ? '⬆️' : '⬇️';
+      toggleBtn.textContent = '🔶';
       toggleBtn.title = savedDirection === 'vertical' ? '切换为横向' : '切换为竖向';
-      
+      toggleBtn.style.transform = savedDirection === 'vertical' ? 'rotate(90deg)' : 'rotate(0deg)';
+      toggleBtn.style.transition = 'transform 0.3s ease';
+
       toggleBtn.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         const isVertical = toolbar.classList.toggle('vertical');
-        toggleBtn.textContent = isVertical ? '⬆️' : '⬇️';
         toggleBtn.title = isVertical ? '切换为横向' : '切换为竖向';
+        toggleBtn.style.transform = isVertical ? 'rotate(90deg)' : 'rotate(0deg)';
         // 保存方向设置
         chrome.storage.local.set({ toolbarDirection: isVertical ? 'vertical' : 'horizontal' });
         console.log('[多引擎工具条] 切换方向:', isVertical ? '竖向' : '横向');
       });
-      
+
       toolbar.appendChild(toggleBtn);
 
       // 引擎按钮
