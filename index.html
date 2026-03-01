@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
   <head>
     <meta charset="UTF-8">
@@ -59,13 +59,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        /* 改为stretch以使子元素拉伸到相同高度 */
         border: 1px solid #575757;
         padding: .2rem;
         box-sizing: border-box;
-        /*确保包含边框的宽度计算 */
         height: 40px;
-        /* 设置高度为可调整 */
       }
 
       .search-engine-list {
@@ -186,7 +183,6 @@
         color: white;
         font-size: 1rem;
         font-weight: 500;
-        /* 调整字体权重以匹配按钮文本的视觉重量 */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -194,7 +190,6 @@
         height: 100%;
         box-sizing: border-box;
         margin: 0;
-        /* 重置默认margin */
         border: none;
       }
 
@@ -215,9 +210,7 @@
 
       .button {
         margin-right: -1px;
-        /*消除右侧空白，与main容器对齐 */
         flex-shrink: 0;
-        /*防止按钮被压缩 */
         min-width: 80px;
         display: flex;
         align-items: center;
@@ -225,7 +218,7 @@
         height: 100%;
       }
 
-      /* 设置面板样式 */
+      /* ========== 设置面板样式 ========== */
       .settings-panel {
         position: fixed;
         top: 0;
@@ -250,12 +243,25 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background-color: #fff;
-        border-radius: 10px;
-        width: 500px;
-        height: 80vh;
+        border-radius: 12px;
+        width: 600px;
+        max-height: 80vh;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        animation: settingsFadeIn 0.3s ease-out;
+      }
+
+      @keyframes settingsFadeIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -55%);
+        }
+
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
       }
 
       body.dark .settings-content {
@@ -263,9 +269,106 @@
         color: #dadada;
       }
 
+      .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid #eee;
+        background-color: #f8f9fa;
+        border-radius: 12px 12px 0 0;
+        flex-shrink: 0;
+      }
+
       body.dark .settings-header {
         background-color: #3a3a3a;
         border-bottom-color: #444;
+      }
+
+      .settings-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .close-btn {
+        font-size: 2rem;
+        cursor: pointer;
+        padding: 0 10px;
+        color: #666;
+        transition: color 0.2s;
+      }
+
+      .close-btn:hover {
+        color: #333;
+      }
+
+      body.dark .close-btn {
+        color: #aaa;
+      }
+
+      body.dark .close-btn:hover {
+        color: #fff;
+      }
+
+      /* Tab 导航样式 */
+      .settings-tabs {
+        display: flex;
+        border-bottom: 2px solid #e9ecef;
+        background-color: #fafafa;
+        flex-shrink: 0;
+      }
+
+      body.dark .settings-tabs {
+        background-color: #333;
+        border-bottom-color: #444;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 14px 20px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #666;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+        position: relative;
+      }
+
+      .tab-button:hover {
+        color: #0078D4;
+        background-color: rgba(0, 120, 212, 0.05);
+      }
+
+      body.dark .tab-button:hover {
+        background-color: rgba(0, 120, 212, 0.1);
+      }
+
+      .tab-button.active {
+        color: #0078D4;
+        border-bottom-color: #0078D4;
+        background-color: #fff;
+      }
+
+      body.dark .tab-button.active {
+        background-color: #2d2d2d;
+      }
+
+      .tab-button .tab-icon {
+        margin-right: 8px;
+        font-size: 1.1rem;
+      }
+
+      /* Tab 内容区域 */
+      .settings-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+        scrollbar-width: thin;
+        scrollbar-color: #0078D4 #f1f1f1;
       }
 
       body.dark .settings-body {
@@ -280,42 +383,6 @@
         background: #0078D4;
       }
 
-      .settings-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-        border-bottom: 1px solid #eee;
-        background-color: #f8f9fa;
-        border-radius: 10px 10px 0 0;
-        flex-shrink: 0;
-      }
-
-      body.dark .settings-header {
-        border-bottom-color: #444;
-      }
-
-      .settings-header h2 {
-        margin: 0;
-        font-size: 1.5rem;
-      }
-
-      .close-btn {
-        font-size: 2rem;
-        cursor: pointer;
-        padding: 0 10px;
-      }
-
-      .settings-body {
-        padding: 20px;
-        overflow-y: auto;
-        flex: 1;
-        /* 自定义滚动条 */
-        scrollbar-width: thin;
-        scrollbar-color: #0078D4 #f1f1f1;
-      }
-
-      /* Webkit浏览器滚动条样式 */
       .settings-body::-webkit-scrollbar {
         width: 8px;
       }
@@ -334,56 +401,57 @@
         background: #005a9e;
       }
 
+      /* Tab 面板 */
+      .tab-pane {
+        display: none;
+        animation: tabFadeIn 0.2s ease-out;
+      }
+
+      .tab-pane.active {
+        display: block;
+      }
+
+      @keyframes tabFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       .settings-section {
-        margin-bottom: 30px;
-        padding: 15px;
+        margin-bottom: 24px;
+        padding: 16px;
         background-color: #f8f9fa;
         border-radius: 8px;
-        border-left: 4px solid #0078D4;
       }
 
       body.dark .settings-section {
         background-color: #333;
-        border-left-color: #0078D4;
-      }
-
-      .settings-section h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        color: #333;
-        padding-bottom: 8px;
-        font-size: 1.2rem;
-        position: relative;
-      }
-
-      .settings-section h3::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 50px;
-        height: 3px;
-        background: linear-gradient(90deg, #0078D4, #005a9e);
-        border-radius: 2px;
-      }
-
-      body.dark .settings-section h3 {
-        color: #dadada;
       }
 
       .setting-item {
         display: flex;
         align-items: center;
-        margin-bottom: 15px;
-        padding: 12px 15px;
+        margin-bottom: 12px;
+        padding: 12px;
         background-color: #fff;
         border-radius: 6px;
         border: 1px solid #e9ecef;
+        transition: all 0.2s;
+      }
+
+      .setting-item:last-child {
+        margin-bottom: 0;
       }
 
       .setting-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border-color: #0078D4;
       }
 
@@ -394,13 +462,14 @@
 
       body.dark .setting-item:hover {
         border-color: #0078D4;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       }
 
       .setting-item label {
         flex: 1;
         font-weight: 500;
         color: #495057;
+        min-width: 100px;
       }
 
       body.dark .setting-item label {
@@ -419,22 +488,23 @@
 
       .setting-item input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         border-radius: 50%;
         background: #0078D4;
         cursor: pointer;
         box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+        transition: all 0.2s;
       }
 
       .setting-item input[type="range"]::-webkit-slider-thumb:hover {
-        transform: scale(1.1);
+        transform: scale(1.15);
         box-shadow: 0 3px 8px rgba(0, 120, 212, 0.4);
       }
 
       .setting-item input[type="range"]::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         border-radius: 50%;
         background: #0078D4;
         cursor: pointer;
@@ -447,7 +517,7 @@
       }
 
       .setting-item span {
-        width: 60px;
+        width: 55px;
         text-align: right;
         font-weight: 600;
         color: #0078D4;
@@ -455,16 +525,18 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        font-size: 0.9rem;
       }
 
       .setting-item select,
       .setting-item input[type="text"] {
         flex: 2;
-        padding: 10px 12px;
+        padding: 8px 12px;
         border: 2px solid #e9ecef;
         border-radius: 6px;
         background-color: #fff;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        transition: all 0.2s;
       }
 
       .setting-item select:focus,
@@ -491,12 +563,13 @@
         background: linear-gradient(135deg, #0078D4, #005a9e);
         color: white;
         border: none;
-        padding: 12px 24px;
+        padding: 10px 20px;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
         box-shadow: 0 2px 6px rgba(0, 120, 212, 0.3);
+        transition: all 0.2s;
       }
 
       .btn-secondary:hover {
@@ -508,18 +581,20 @@
         transform: translateY(0);
       }
 
-      .btn-secondary:hover {
-        background-color: #005a9e;
-      }
-
       .engine-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
-        margin: 5px 0;
+        padding: 12px;
+        margin: 8px 0;
         background-color: #f0f0f0;
-        border-radius: 5px;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .engine-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
       body.dark .engine-item {
@@ -528,16 +603,25 @@
 
       .engine-info {
         flex: 1;
+        min-width: 0;
       }
 
       .engine-name {
         font-weight: bold;
-        margin-bottom: 3px;
+        margin-bottom: 4px;
+        color: #333;
+      }
+
+      body.dark .engine-name {
+        color: #e9ecef;
       }
 
       .engine-url {
-        font-size: 0.9em;
+        font-size: 0.85em;
         color: #666;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       body.dark .engine-url {
@@ -546,15 +630,22 @@
 
       .engine-actions {
         display: flex;
-        gap: 5px;
+        gap: 6px;
+        margin-left: 10px;
       }
 
       .engine-btn {
-        padding: 5px 10px;
+        padding: 6px 12px;
         border: none;
-        border-radius: 3px;
+        border-radius: 4px;
         cursor: pointer;
         font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .engine-btn:hover {
+        transform: scale(1.05);
       }
 
       .edit-btn {
@@ -562,19 +653,40 @@
         color: #000;
       }
 
+      .edit-btn:hover {
+        background-color: #ffb300;
+      }
+
       .delete-btn {
         background-color: #dc3545;
         color: white;
+      }
+
+      .delete-btn:hover {
+        background-color: #c82333;
       }
 
       .engine-form {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        padding: 15px;
+        padding: 16px;
         background-color: #e9ecef;
-        border-radius: 5px;
+        border-radius: 6px;
         margin: 10px 0;
+        animation: formSlideIn 0.2s ease-out;
+      }
+
+      @keyframes formSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       body.dark .engine-form {
@@ -582,14 +694,21 @@
       }
 
       .engine-form input {
-        padding: 8px;
+        padding: 10px 12px;
         border: 1px solid #ddd;
-        border-radius: 4px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+
+      .engine-form input:focus {
+        outline: none;
+        border-color: #0078D4;
+        box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
       }
 
       .engine-form-buttons {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         justify-content: flex-end;
       }
 
@@ -598,9 +717,28 @@
         color: white;
       }
 
+      .save-btn:hover {
+        background-color: #218838;
+      }
+
       .cancel-btn {
         background-color: #6c757d;
         color: white;
+      }
+
+      .cancel-btn:hover {
+        background-color: #5a6268;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 30px;
+        color: #999;
+        font-size: 0.9rem;
+      }
+
+      body.dark .empty-state {
+        color: #777;
       }
     </style>
   </head>
@@ -615,75 +753,101 @@
         <div class="settings-overlay"></div>
         <div class="settings-content">
           <div class="settings-header">
-            <h2>设置</h2>
+            <h3>设置</h3>
             <span id="closeSettings" class="close-btn">×</span>
           </div>
+
+          <!-- Tab 导航 -->
+          <div class="settings-tabs">
+            <button class="tab-button active" data-tab="appearance">
+              <span class="tab-icon">🎨</span>外观
+            </button>
+            <button class="tab-button" data-tab="style">
+              <span class="tab-icon">📐</span>样式
+            </button>
+            <button class="tab-button" data-tab="behavior">
+              <span class="tab-icon">⚡</span>行为
+            </button>
+            <button class="tab-button" data-tab="engines">
+              <span class="tab-icon">🔍</span>引擎
+            </button>
+          </div>
+
+          <!-- Tab 内容 -->
           <div class="settings-body">
-            <div class="settings-section">
-              <h3>主题设置</h3>
-              <div class="setting-item">
-                <label>主题模式</label>
-                <select id="themeSelect">
-                  <option value="light">浅色模式</option>
-                  <option value="dark">深色模式</option>
-                </select>
+            <!-- 外观设置 -->
+            <div id="tab-appearance" class="tab-pane active">
+              <div class="settings-section">
+                <div class="setting-item">
+                  <label for="themeSelect">主题模式</label>
+                  <select id="themeSelect">
+                    <option value="light">浅色模式</option>
+                    <option value="dark">深色模式</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div class="settings-section">
-              <h3>搜索框样式</h3>
-              <div class="setting-item">
-                <label>搜索框宽度</label>
-                <input type="range" id="widthSlider" min="400" max="800" step="10">
-                <span id="widthValue">600px</span>
-              </div>
-              <div class="setting-item">
-                <label>搜索框高度</label>
-                <input type="range" id="heightSlider" min="30" max="100" step="5">
-                <span id="heightValue">40px</span>
-              </div>
-              <div class="setting-item">
-                <label>圆角大小</label>
-                <input type="range" id="radiusSlider" min="0" max="30" step="1">
-                <span id="radiusValue">0px</span>
-              </div>
-              <div class="setting-item">
-                <label>字体大小</label>
-                <input type="range" id="fontSizeSlider" min="12" max="24" step="1">
-                <span id="fontSizeValue">16px</span>
-              </div>
-              <div class="setting-item">
-                <label>顶部间距</label>
-                <input type="range" id="topHeightSlider" min="0" max="50" step="10">
-                <span id="topHeightValue">0px</span>
-              </div>
-            </div>
-
-            <div class="settings-section">
-              <h3>搜索行为设置</h3>
-              <div class="setting-item">
-                <label>搜索结果打开方式</label>
-                <select id="searchTargetSelect">
-                  <option value="_self">当前标签页打开</option>
-                  <option value="_blank">新标签页打开</option>
-                </select>
-              </div>
-              <div class="setting-item">
-                <label>多引擎切换工具条</label>
-                <select id="multiEngineSelect">
-                  <option value="off">关闭</option>
-                  <option value="on">开启 (在搜索结果页显示)</option>
-                </select>
+            <!-- 样式设置 -->
+            <div id="tab-style" class="tab-pane">
+              <div class="settings-section">
+                <div class="setting-item">
+                  <label for="widthSlider">搜索框宽度</label>
+                  <input type="range" id="widthSlider" min="400" max="800" step="10">
+                  <span id="widthValue">600px</span>
+                </div>
+                <div class="setting-item">
+                  <label for="heightSlider">搜索框高度</label>
+                  <input type="range" id="heightSlider" min="30" max="100" step="5">
+                  <span id="heightValue">40px</span>
+                </div>
+                <div class="setting-item">
+                  <label for="radiusSlider">圆角大小</label>
+                  <input type="range" id="radiusSlider" min="0" max="30" step="1">
+                  <span id="radiusValue">0px</span>
+                </div>
+                <div class="setting-item">
+                  <label for="fontSizeSlider">字体大小</label>
+                  <input type="range" id="fontSizeSlider" min="12" max="24" step="1">
+                  <span id="fontSizeValue">16px</span>
+                </div>
+                <div class="setting-item">
+                  <label for="topHeightSlider">顶部间距</label>
+                  <input type="range" id="topHeightSlider" min="0" max="50" step="10">
+                  <span id="topHeightValue">0px</span>
+                </div>
               </div>
             </div>
 
-            <div class="settings-section">
-              <h3>搜索引擎管理</h3>
-              <div class="setting-item">
-                <button id="addEngineBtn" class="btn-secondary">添加搜索引擎</button>
+            <!-- 行为设置 -->
+            <div id="tab-behavior" class="tab-pane">
+              <div class="settings-section">
+                <div class="setting-item">
+                  <label for="searchTargetSelect">搜索结果打开方式</label>
+                  <select id="searchTargetSelect">
+                    <option value="_self">当前标签页打开</option>
+                    <option value="_blank">新标签页打开</option>
+                  </select>
+                </div>
+                <div class="setting-item">
+                  <label for="multiEngineSelect">多引擎切换工具条</label>
+                  <select id="multiEngineSelect">
+                    <option value="off">关闭</option>
+                    <option value="on">开启 (在搜索结果页显示)</option>
+                  </select>
+                </div>
               </div>
-              <div id="engineList" class="engine-list">
-                <!--搜索引擎列表将在这里动态生成 -->
+            </div>
+
+            <!-- 引擎管理 -->
+            <div id="tab-engines" class="tab-pane">
+              <div class="settings-section">
+                <div class="setting-item">
+                  <button id="addEngineBtn" class="btn-secondary">+ 添加搜索引擎</button>
+                </div>
+                <div id="engineList">
+                  <!-- 搜索引擎列表将在这里动态生成 -->
+                </div>
               </div>
             </div>
           </div>

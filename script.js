@@ -261,6 +261,22 @@ document.querySelector('.settings-overlay').addEventListener('click', function (
   document.getElementById('settingsPanel').style.display = 'none'
 })
 
+// Tab 切换功能
+document.querySelectorAll('.tab-button').forEach(button => {
+  button.addEventListener('click', function () {
+    const tabId = this.dataset.tab
+    
+    // 移除所有 tab 按钮的 active 类
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'))
+    // 移除所有 tab 面板的 active 类
+    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'))
+    
+    // 添加当前 tab 按钮和面板的 active 类
+    this.classList.add('active')
+    document.getElementById(`tab-${tabId}`).classList.add('active')
+  })
+})
+
 // 加载设置
 function loadSettings() {
   // 主题设置
