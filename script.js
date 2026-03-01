@@ -7,10 +7,12 @@ function setTheme(dark = true) {
   if (dark) {
     localStorage.setItem('theme', 'dark')
     document.body.className = 'dark'
+    chrome.storage.local.set({ theme: 'dark' })
   }
   else {
     localStorage.setItem('theme', 'light')
     document.body.className = ''
+    chrome.storage.local.set({ theme: 'light' })
   }
 
   // 确保搜索引擎列表在主题切换后正确显示
@@ -33,6 +35,7 @@ function getSearchBoxTopHeight() {
 
 function setSearchBoxTopHeight(height) {
   localStorage.setItem('searchBoxTopHeight', height)
+  chrome.storage.local.set({ searchBoxTopHeight: height })
 }
 
 //搜索框宽度
@@ -42,6 +45,7 @@ function getSearchBoxWidth() {
 
 function setSearchBoxWidth(width) {
   localStorage.setItem('searchBoxWidth', width + 'px')
+  chrome.storage.local.set({ searchBoxWidth: width + 'px' })
 }
 
 
@@ -53,6 +57,7 @@ function getSearchBoxRadiusSize() {
 
 function setSearchBoxRadiusSize(size) {
   localStorage.setItem('searchBoxRadiusSize', size)
+  chrome.storage.local.set({ searchBoxRadiusSize: size })
 }
 
 // 搜索框字体大小
@@ -63,6 +68,7 @@ function getSearchBoxFontSize() {
 
 function setSearchBoxFontSize(size) {
   localStorage.setItem('searchBoxFontSize', size)
+  chrome.storage.local.set({ searchBoxFontSize: size })
 }
 
 // 搜索框高度
@@ -73,6 +79,7 @@ function getSearchBoxHeight() {
 
 function setSearchBoxHeight(height) {
   localStorage.setItem('searchBoxHeight', height)
+  chrome.storage.local.set({ searchBoxHeight: height })
 }
 
 // 搜索行为设置
@@ -82,15 +89,35 @@ function getSearchTarget() {
 
 function setSearchTarget(target) {
   localStorage.setItem('searchTarget', target)
+  chrome.storage.local.set({ searchTarget: target })
+}
+
+// 多引擎搜索模式
+function getMultiEngineMode() {
+  return localStorage.getItem('multiEngineMode') || 'off'
+}
+
+function setMultiEngineMode(mode) {
+  localStorage.setItem('multiEngineMode', mode)
+  chrome.storage.local.set({ multiEngineMode: mode })
 }
 
 // 搜索引擎列表
 function getSearchEngineList() {
-  return JSON.parse(localStorage.getItem('searchEngineList')) || []
+  const list = localStorage.getItem('searchEngineList')
+  if (list) {
+    try {
+      return JSON.parse(list)
+    } catch (e) {
+      return []
+    }
+  }
+  return []
 }
 
 function setSearchEngineList(list) {
   localStorage.setItem('searchEngineList', JSON.stringify(list))
+  chrome.storage.local.set({ searchEngineList: list })
   // 可用引擎为空则重置
   if (list.length === 0) resetSearchEngineList()
 }
@@ -106,10 +133,19 @@ function setSearchEngine(engine) {
     engine = JSON.stringify(engine)
   }
   localStorage.setItem('searchEngine', engine)
+  chrome.storage.local.set({ searchEngine: engine })
 }
 
 function getSearchEngine() {
-  return JSON.parse(localStorage.getItem('searchEngine')) || getSearchEngineList()[0]
+  const engine = localStorage.getItem('searchEngine')
+  if (engine) {
+    try {
+      return JSON.parse(engine)
+    } catch (e) {
+      return getSearchEngineList()[0]
+    }
+  }
+  return getSearchEngineList()[0]
 }
 
 // 重置
@@ -123,6 +159,7 @@ function reset() {
   setSearchBoxRadiusSize("0")
   setSearchBoxFontSize("16")
   setSearchTarget("_blank")
+  setMultiEngineMode("off")
   resetSearchEngineList()
   setSearchEngine(getSearchEngineList()[0])
   localStorage.setItem('InitializeFlag', 'True')
@@ -250,6 +287,9 @@ function loadSettings() {
 
   // 搜索行为设置
   document.getElementById('searchTargetSelect').value = getSearchTarget()
+
+  // 多引擎搜索模式
+  document.getElementById('multiEngineSelect').value = getMultiEngineMode()
 
   // 加载搜索引擎列表
   loadEngineList()
@@ -393,6 +433,10 @@ document.getElementById('themeSelect').addEventListener('change', function () {
 
 document.getElementById('searchTargetSelect').addEventListener('change', function () {
   setSearchTarget(this.value)
+})
+
+document.getElementById('multiEngineSelect').addEventListener('change', function () {
+  setMultiEngineMode(this.value)
 })
 
 document.getElementById('widthSlider').addEventListener('input', function () {
@@ -585,26 +629,6 @@ document.addEventListener('visibilitychange', function () {
   }
 })
 
-
-
-// 添加搜索功能
-document.querySelector('.button button').addEventListener('click', function () {
-  const query = document.querySelector('.search-box').value.trim()
-  if (query) {
-    const engine = getSearchEngine()
-    const searchUrl = engine.url.replace('%d', encodeURIComponent(query))
-    const target = getSearchTarget()
-    if (target === '_blank') {
-      window.open(searchUrl, '_blank')
-    } else {
-      window.location.href = searchUrl
-    }
-  } else {
-    // 如果搜索框为空，聚焦到搜索框
-    document.querySelector('.search-box').focus()
-  }
-})
-
 //移除搜索框焦点效果（用户要求去除难看的焦点框）
 document.querySelector('.search-box').addEventListener('focus', function () {
   this.style.outline = 'none'
@@ -624,23 +648,6 @@ document.getElementById('settingsBtn').addEventListener('mouseenter', function (
 
 document.getElementById('settingsBtn').addEventListener('mouseleave', function () {
   this.style.transform = 'scale(1)'
-})
-
-// 回车键搜索
-document.querySelector('.search-box').addEventListener('keypress', function (e) {
-  if (e.key === 'Enter') {
-    const query = this.value.trim()
-    if (query) {
-      const engine = getSearchEngine()
-      const searchUrl = engine.url.replace('%d', encodeURIComponent(query))
-      const target = getSearchTarget()
-      if (target === '_blank') {
-        window.open(searchUrl, '_blank')
-      } else {
-        window.location.href = searchUrl
-      }
-    }
-  }
 })
 
 // 添加全局键盘快捷键来聚焦搜索框 (例如 Alt+S 或 Ctrl+K)
@@ -664,4 +671,36 @@ window.addEventListener('load', function () {
 // 添加错误处理
 window.addEventListener('error', function (e) {
   console.error('页面错误:', e.error)
+})
+
+// 搜索功能
+function performSearch() {
+  const query = document.querySelector('.search-box').value.trim()
+  if (query) {
+    const engine = getSearchEngine()
+    if (!engine || !engine.url) {
+      console.error('搜索引擎配置无效:', engine)
+      return
+    }
+    const searchUrl = engine.url.replace('%d', encodeURIComponent(query))
+    const target = getSearchTarget()
+
+    if (target === '_blank') {
+      window.open(searchUrl, '_blank')
+    } else {
+      window.location.href = searchUrl
+    }
+  } else {
+    document.querySelector('.search-box').focus()
+  }
+}
+
+// 搜索按钮事件
+document.querySelector('.button button').addEventListener('click', performSearch)
+
+// 回车键搜索
+document.querySelector('.search-box').addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    performSearch()
+  }
 })
